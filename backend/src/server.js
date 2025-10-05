@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { initDB } from "./config/db.js";
 import rateLimiter from "./middleware/rateLimiter.js";
+import cors from "cors";
 
 import transactionsRoute from "./routes/transactionsRoute.js";
 import job from "./config/cron.js";
@@ -15,12 +16,7 @@ if (process.env.NODE_ENV === "production") job.start();
 // middleware
 app.use(rateLimiter);
 app.use(express.json());
-
-// our custom simple middleware
-// app.use((req, res, next) => {
-//   console.log("Hey we hit a req, the method is", req.method);
-//   next();
-// });
+app.use(cors());
 
 const PORT = process.env.PORT || 5001;
 
