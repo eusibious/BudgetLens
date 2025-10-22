@@ -60,7 +60,7 @@ export async function deleteTransaction(req, res) {
   }
 }
 
-export async function getSummaryByUserId(req, res) {
+export async function getTransactionSummaryByUserId(req, res) {
   try {
     const { userId } = req.params;
 

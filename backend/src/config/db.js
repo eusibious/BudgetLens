@@ -10,11 +10,23 @@ export async function initDB() {
     await sql`CREATE TABLE IF NOT EXISTS transactions(
       id SERIAL PRIMARY KEY,
       user_id VARCHAR(255) NOT NULL,
-      title  VARCHAR(255) NOT NULL,
+      description  VARCHAR(255) NOT NULL,
       amount  DECIMAL(10,2) NOT NULL,
       category VARCHAR(255) NOT NULL,
       transaction_type VARCHAR(50) NOT NULL,
       created_at DATE NOT NULL DEFAULT CURRENT_DATE
+    )`;
+
+    await sql`CREATE TABLE IF NOT EXISTS loans(
+      id SERIAL PRIMARY KEY,
+      user_id VARCHAR(255) NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      amount DECIMAL(10,2) NOT NULL,
+      loan_type VARCHAR(50) NOT NULL,
+      status VARCHAR(50) NOT NULL DEFAULT 'pending',
+      borrow_date DATE NOT NULL,
+      due_date DATE NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`;
 
     console.log("Database initialized successfully");

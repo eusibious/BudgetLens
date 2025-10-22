@@ -1,0 +1,83 @@
+import { sql } from "../config/db.js";
+
+export async function getLoanByUserId(req, res) {
+  try {
+    const { userId } = req.params;
+
+    const loans = await sql`
+        SELECT * FROM loans WHERE user_id = ${userId} ORDER BY created_at DESC
+      `;
+
+    res.status(200).json(loans);
+  } catch (error) {
+    console.log("Error getting the loans", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function createLoan(req, res) {
+  try {
+    const { loan_type, status, amount, name, borrow_date, due_date, user_id  } = req.body;
+
+    if (!loan_type || !name || !user_id || amount === undefined || !borrow_date || !due_date) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const loan = await sql`
+      INSERT INTO loans(user_id,name,amount,loan_type,status,borrow_date,due_date)
+      VALUES (${user_id},${name},${amount},${loan_type},${status},${borrow_date},${due_date})
+      RETURNING *
+    `;
+
+    console.log(loan);
+    res.status(201).json(loan[0]);
+  } catch (error) {
+    console.log("Error creating the loan", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function deleteLoan(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (isNaN(parseInt(id))) {
+      return res.status(400).json({ message: "Invalid loan ID" });
+    }
+
+    const result = await sql`
+      DELETE FROM loans WHERE id = ${id} RETURNING *
+    `;
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Loan not found" });
+    }
+
+    res.status(200).json({ message: "Loan deleted successfully" });
+  } catch (error) {
+    console.log("Error deleting the loan", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function getLoanSummaryByUserId(req, res) {
+  try {
+    const { userId } = req.params;
+
+    const borrowedAmount = await sql`
+      SELECT COALESCE(SUM(amount), 0) as borrowed FROM loans WHERE user_id = ${userId} AND loan_type = 'borrow'
+    `;
+    const lentAmount = await sql`
+      SELECT COALESCE(SUM(amount), 0) as lent FROM loans WHERE user_id = ${userId} AND loan_type = 'lend'
+    `;
+
+
+    res.status(200).json({
+      borrowed: borrowedAmount[0].borrowed,
+      lent: lentAmount[0].lent,
+    });
+  } catch (error) {
+    console.log("Error getting the summary", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
