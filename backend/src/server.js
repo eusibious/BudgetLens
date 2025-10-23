@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { initDB } from "./config/db.js";
 import rateLimiter from "./middleware/rateLimiter.js";
 import cors from "cors";
-
+import loansRoute from "./routes/loansRoute.js";
 import transactionsRoute from "./routes/transactionsRoute.js";
 import job from "./config/cron.js";
 
@@ -25,6 +25,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/transactions", transactionsRoute);
+app.use("/api/loans", loansRoute);
 
 initDB().then(() => {
   app.listen(PORT, () => {
