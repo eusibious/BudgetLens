@@ -24,3 +24,5 @@ hs_err_pid*
 replay_pid*
 Docs
 .expo
+
+node_modules
