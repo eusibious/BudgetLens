@@ -67,14 +67,14 @@ export async function getLoanSummaryByUserId(req, res) {
     const borrowedAmount = await sql`
       SELECT COALESCE(SUM(amount), 0) as borrowed FROM loans WHERE user_id = ${userId} AND loan_type = 'borrow'
     `;
-    const lentAmount = await sql`
-      SELECT COALESCE(SUM(amount), 0) as lent FROM loans WHERE user_id = ${userId} AND loan_type = 'lend'
+    const lendAmount = await sql`
+      SELECT COALESCE(SUM(amount), 0) as lend FROM loans WHERE user_id = ${userId} AND loan_type = 'lend'
     `;
 
 
     res.status(200).json({
       borrowed: borrowedAmount[0].borrowed,
-      lent: lentAmount[0].lent,
+      lend: lendAmount[0].lend,
     });
   } catch (error) {
     console.log("Error getting the summary", error);
