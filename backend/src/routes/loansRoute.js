@@ -1,7 +1,7 @@
 import express from "express";
 import {
   createLoan,
-  deleteLoan,
+  updateLoan,
   getLoanSummaryByUserId,
   getLoanByUserId,
 } from "../controllers/loansController.js";
@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get("/:userId", getLoanByUserId);
 router.post("/", createLoan);
-router.delete("/:id", deleteLoan);
+router.put("/:id", updateLoan);
 router.get("/summary/:userId", getLoanSummaryByUserId);
 
 export default router;

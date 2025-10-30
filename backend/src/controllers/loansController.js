@@ -37,7 +37,7 @@ export async function createLoan(req, res) {
   }
 }
 
-export async function deleteLoan(req, res) {
+export async function updateLoan(req, res) {
   try {
     const { id } = req.params;
 
@@ -46,16 +46,18 @@ export async function deleteLoan(req, res) {
     }
 
     const result = await sql`
-      DELETE FROM loans WHERE id = ${id} RETURNING *
+      UPDATE loans
+      SET status = "paid"
+      WHERE id = ${id};
     `;
 
     if (result.length === 0) {
-      return res.status(404).json({ message: "Loan not found" });
+      return res.status(404).json({ message: "Record not found" });
     }
 
-    res.status(200).json({ message: "Loan deleted successfully" });
+    res.status(200).json({ message: "Loan updated successfully" });
   } catch (error) {
-    console.log("Error deleting the loan", error);
+    console.log("Error updating the loan", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
