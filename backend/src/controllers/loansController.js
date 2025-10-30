@@ -37,7 +37,7 @@ export async function createLoan(req, res) {
   }
 }
 
-export async function deleteLoan(req, res) {
+export async function updateLoan(req, res) {
   try {
     const { id } = req.params;
 
@@ -46,16 +46,18 @@ export async function deleteLoan(req, res) {
     }
 
     const result = await sql`
-      DELETE FROM loans WHERE id = ${id} RETURNING *
+      UPDATE loans
+      SET status = "paid"
+      WHERE id = ${id};
     `;
 
     if (result.length === 0) {
-      return res.status(404).json({ message: "Loan not found" });
+      return res.status(404).json({ message: "Record not found" });
     }
 
-    res.status(200).json({ message: "Loan deleted successfully" });
+    res.status(200).json({ message: "Loan updated successfully" });
   } catch (error) {
-    console.log("Error deleting the loan", error);
+    console.log("Error updating the loan", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -70,10 +72,10 @@ export async function getLoanSummaryByUserId(req, res) {
     const lendAmount = await sql`
       SELECT COALESCE(SUM(amount), 0) as lend FROM loans WHERE user_id = ${userId} AND loan_type = 'lend'
     `;
-    const totalBorrowed = await sql`
+    const countBorrowed = await sql`
       SELECT count(*) as borrowedCount FROM loans WHERE user_id = ${userId} AND loan_type = 'borrow'
     `;
-    const totalLend = await sql`
+    const countLend = await sql`
       SELECT count(*) as lendCount FROM loans WHERE user_id = ${userId} AND loan_type = 'lend'
     `;
     const pendingBorrowed = await sql`
@@ -87,15 +89,11 @@ export async function getLoanSummaryByUserId(req, res) {
       WHERE user_id = ${userId} AND loan_type = 'lend' AND status = 'pending'
     `;
     
-
-    
-
-
     res.status(200).json({
       borrowed: borrowedAmount[0].borrowed,
       lend: lendAmount[0].lend,
-      totalBorrowed: totalBorrowed[0].borrowedCount,
-      totalLend: totalLend[0].lendCount,
+      totalBorrowed: countBorrowed[0].borrowedCount,
+      totalLend: countLend[0].lendCount,
       pendingBorrowed: pendingBorrowed[0].count,
       pendingLend: pendingLend[0].count,  
     });
