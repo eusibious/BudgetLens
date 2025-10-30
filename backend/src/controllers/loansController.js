@@ -70,10 +70,10 @@ export async function getLoanSummaryByUserId(req, res) {
     const lendAmount = await sql`
       SELECT COALESCE(SUM(amount), 0) as lend FROM loans WHERE user_id = ${userId} AND loan_type = 'lend'
     `;
-    const totalBorrowed = await sql`
+    const countBorrowed = await sql`
       SELECT count(*) as borrowedCount FROM loans WHERE user_id = ${userId} AND loan_type = 'borrow'
     `;
-    const totalLend = await sql`
+    const countLend = await sql`
       SELECT count(*) as lendCount FROM loans WHERE user_id = ${userId} AND loan_type = 'lend'
     `;
     const pendingBorrowed = await sql`
@@ -87,15 +87,11 @@ export async function getLoanSummaryByUserId(req, res) {
       WHERE user_id = ${userId} AND loan_type = 'lend' AND status = 'pending'
     `;
     
-
-    
-
-
     res.status(200).json({
       borrowed: borrowedAmount[0].borrowed,
       lend: lendAmount[0].lend,
-      totalBorrowed: totalBorrowed[0].borrowedCount,
-      totalLend: totalLend[0].lendCount,
+      totalBorrowed: countBorrowed[0].borrowedCount,
+      totalLend: countLend[0].lendCount,
       pendingBorrowed: pendingBorrowed[0].count,
       pendingLend: pendingLend[0].count,  
     });
