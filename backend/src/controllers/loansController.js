@@ -40,14 +40,19 @@ export async function createLoan(req, res) {
 export async function updateLoan(req, res) {
   try {
     const { id } = req.params;
+    const { status } = req.body;
 
     if (isNaN(parseInt(id))) {
       return res.status(400).json({ message: "Invalid loan ID" });
     }
 
+    if (!status || (status !== 'pending' && status !== 'paid')) {
+      return res.status(400).json({ message: "Invalid status. Must be 'pending' or 'paid'" });
+    }
+    
     const result = await sql`
       UPDATE loans
-      SET status = "paid"
+      SET status = ${status}
       WHERE id = ${id};
     `;
 
